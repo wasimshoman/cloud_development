@@ -1,0 +1,38 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "dynamodb:ListTables",
+                "dynamodb:ListBackups",
+                "dynamodb:PurchaseReservedCapacityOfferings",
+                "dynamodb:UpdateAbacStatus",
+                "dynamodb:GetAbacStatus",
+                "dynamodb:ListStreams",
+                "dynamodb:ListContributorInsights",
+                "dynamodb:DescribeReservedCapacityOfferings",
+                "dynamodb:ListGlobalTables",
+                "dynamodb:DescribeReservedCapacity",
+                "dynamodb:ListImports",
+                "dynamodb:DescribeLimits",
+                "dynamodb:DescribeEndpoints",
+                "dynamodb:ListExports"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": "dynamodb:*",
+            "Resource": "arn:aws:dynamodb:*:690470233819:table/*"
+        },
+        {
+            "Sid": "VisualEditor2",
+            "Effect": "Deny",
+            "Action": "dynamodb:Scan",
+            "Resource": "*"
+        }
+    ]
+}
