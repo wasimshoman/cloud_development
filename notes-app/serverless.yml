@@ -1,0 +1,87 @@
+service: notes-app  # the name of our application
+
+provider:
+  name: aws
+  runtime: python3.9  # our Lambda functions are written in Python
+  region: us-east-1   # deployed to N. Virginia
+  environment:
+    NOTES_TABLE: notes-table  # we store the table name here so all functions can use it
+
+  # These are the permissions we give to our Lambda functions.
+  # Without these, the functions wouldn't be allowed to touch DynamoDB or EventBridge.
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem     # createNote needs this
+            - dynamodb:GetItem     # getNote needs this
+            - dynamodb:UpdateItem  # updateNote needs this
+            - dynamodb:DeleteItem  # deleteNote needs this
+            - dynamodb:Scan        # getAllNotes needs this
+            - events:PutEvents     # lets functions fire events to EventBridge
+          Resource: "*"
+
+functions:
+  # Each function below has its own .py file and its own route in API Gateway
+
+  createNote:
+    handler: functions/createNote.handler
+    events:
+      - httpApi:
+          path: /notes
+          method: POST  # POST /notes → creates a new note
+
+  getAllNotes:
+    handler: functions/getAllNotes.handler
+    events:
+      - httpApi:
+          path: /notes
+          method: GET  # GET /notes → returns all notes
+
+  getNote:
+    handler: functions/getNote.handler
+    events:
+      - httpApi:
+          path: /notes/{id}
+          method: GET  # GET /notes/{id} → returns one specific note
+
+  updateNote:
+    handler: functions/updateNote.handler
+    events:
+      - httpApi:
+          path: /notes/{id}
+          method: PUT  # PUT /notes/{id} → updates title and content
+
+  deleteNote:
+    handler: functions/deleteNote.handler
+    events:
+      - httpApi:
+          path: /notes/{id}
+          method: DELETE  # DELETE /notes/{id} → removes the note permanently
+
+  # This function is different — it's not triggered by HTTP.
+  # EventBridge fires it automatically when an event from "notes-app" is detected.
+  logEvent:
+    handler: functions/logEvent.handler
+    events:
+      - eventBridge:
+          eventBus: default
+          pattern:
+            source:
+              - notes-app  # only listen for events coming from our app
+
+# This section tells AWS to create the DynamoDB table for us on deploy
+resources:
+  Resources:
+    NotesTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: notes-table
+        BillingMode: PAY_PER_REQUEST  # we only pay when the table is actually used
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S  # S means String — our ids are text
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH  # id is the primary key for looking up notes

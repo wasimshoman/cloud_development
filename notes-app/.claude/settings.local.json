@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(serverless --version)",
+      "Bash(aws --version)",
+      "Bash(npm install *)",
+      "Bash(aws configure list *)",
+      "Bash(aws sts get-caller-identity *)",
+      "Bash(serverless deploy *)",
+      "Bash(curl *)",
+      "Bash(winget list *)",
+      "Bash(code *)",
+      "Bash(serverless remove *)",
+      "Read(//c/Users/wss7/Projects/internal/cloud_development//**)",
+      "Read(//c/Users/wss7/Projects/internal/cloud_development/**)"
+    ]
+  }
+}
